@@ -1,0 +1,64 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  color: #2587c6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+}
+
+.font-white {
+  color: white;
+}
+
+a.link-white:link {
+  color: white;
+}
+
+a.link-white:hover {
+  color: lightcyan;
+}
+
+a.link-white:active {
+  color: mediumspringgreen;
+}
+
+a.link-white:visited {
+  color: white;
+}
+
+.title-default {
+  color: cyan;
+  text-shadow: 2px 2px lightskyblue;
+}
