@@ -2,14 +2,17 @@ import MasterLayout from "../components/layout/master";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../state/hooks";
 import { fetchListing, getList } from "../state/login/userListState";
+import { useRouter } from "next/router";
+import { NextPage } from "next";
 
-const Home = () => {
+const Home: NextPage = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const userData = useAppSelector(getList);
-
   useEffect(() => {
-    dispatch(fetchListing({ url: process.env.NEXT_PUBLIC_USER_LIST_API }));
-  }, [useAppDispatch]);
+    if (!router.isReady) return;
+    dispatch(fetchListing());
+  }, [dispatch]);
 
   return (
     <MasterLayout title="Home | CompanyZ Customer Portal">

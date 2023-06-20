@@ -1,19 +1,50 @@
 import styles from "../../styles/Home.module.css";
-import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRouter as useRouterNav } from "next/navigation";
+import {
+  getParam,
+  tokenRefresh,
+  tokenRevoke,
+} from "../../services/auth/google";
+import { useAppDispatch, useAppSelector } from "../../state/hooks";
+import { selectUser, reset, setUser } from "../../state/login/userState";
+import { reset as resetUserList } from "../../state/login/userListState";
+import { useEffect } from "react";
+import { purge } from "../../pages/_app";
 
 function NavbarCpn() {
-  // const { data: session } = useSession();
-  const router = useRouter();
-  const { push } = useRouterNav();
-  const { data, status } = useSession();
-  var session = data;
-  if (status == "unauthenticated" && router.pathname !== "/") {
-    push("/");
-  } else if (status == "authenticated" && router.pathname == "/") {
-    push("/home");
+  const userProfile = useAppSelector(selectUser);
+  let router = useRouter();
+  let { push } = useRouterNav();
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    (async () => {
+      if (!router.isReady) return;
+      if (!userProfile?.email && router.pathname !== "/") {
+        push("/");
+      } else if (userProfile?.email && router.pathname == "/") {
+        push("/home");
+      }
+
+      if (userProfile?.email) {
+        let userData = await tokenRefresh(userProfile);
+        if (userData != null) {
+          dispatch(setUser(userData));
+        }
+      }
+    })();
+  }, [userProfile]);
+
+  async function signOut() {
+    if (userProfile?.access_token && userProfile?.access_token !== "") {
+      const accessToken = userProfile.access_token; 
+      dispatch(reset());
+      dispatch(resetUserList());
+      await tokenRevoke(accessToken);
+      await purge();
+      window.location.href = "/";
+    }
   }
 
   return (
@@ -34,7 +65,7 @@ function NavbarCpn() {
         </button>
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <div className="navbar-nav">
-            {session && session.user ? (
+            {userProfile && userProfile.email ? (
               <>
                 <Link className={`nav-item nav-link link-white`} href="/home">
                   Home
@@ -88,14 +119,14 @@ function NavbarCpn() {
             )}
           </div>
           <div className="navbar-nav ms-auto">
-            {session && session.user && session.user.name ? (
-              session.user.name + " | "
+            {userProfile && userProfile.email ? (
+              userProfile.name + " | "
             ) : (
               <></>
             )}
           </div>
           <div className="navbar-nav">
-            {session && session.user ? (
+            {userProfile && userProfile.email ? (
               <a
                 href="#"
                 className="nav-item nav-link link-white"
@@ -107,7 +138,7 @@ function NavbarCpn() {
               <a
                 href="#"
                 className="nav-item nav-link link-white"
-                onClick={() => signIn()}
+                onClick={() => push(getParam())}
               >
                 Sign In
               </a>
